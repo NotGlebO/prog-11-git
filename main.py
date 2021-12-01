@@ -1,4 +1,4 @@
-a = eval(input("Write a list: "))
+a = input("Write a list: ")
 
 def countNumbers(rool):
   summa = 0
