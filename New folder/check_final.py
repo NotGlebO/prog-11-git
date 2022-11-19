@@ -1,0 +1,68 @@
+from tkinter import * 
+from tkinter import ttk
+import random
+
+check = random.randrange(1, 999999)
+f = open(f"/Users/PC/Desktop/School/prog/check/check{check}.txt", "w", encoding="utf-8") 
+root = Tk()
+#Размеры
+root.title('PC')
+root.geometry('400x200+700+500')
+root.resizable(width=True, height=True)
+
+#Сохранять в вайл
+class Table:
+    def __init__(self, veids, modelis, cena):
+        self.veids = veids
+        self.modelis = modelis
+        self.cena = cena
+    def check_pr(self):
+        l = ['-Personālā datora sastāvdaļa-\n','Veids: ' + self.veids + "\n", "Modelis: " + self.modelis + "\n" ,"Cena: " + str(self.cena) ]
+        f.writelines(l)
+
+
+def button_update():
+    veid_check= Label(root, text= "Veids: {}".format(veidsstr.get()) ).place(x=200, y=30)
+    modelis_check = Label(root, text= "Modelis: {}".format(modelisstr.get())).place(x=200, y=50)
+    cen_check = Label(root, text= "Cena: {}".format(cenastr.get()) ).place(x=200, y=70)
+
+#Список товаров
+vlist = ['RAM', 'CPU', 'GPU']
+mlist = ['Corsair Vengeance LPX 16GB', 'Gigabyte GeForce 720 2GB', 'AMD Ryzen 7 5800x 3,8GHz']
+
+
+def save():
+    print_check = Table(veidsstr.get(), modelisstr.get(), cenastr.get())
+    print_check.check_pr()
+
+veidsstr = StringVar()
+modelisstr = StringVar()
+cenastr = StringVar()
+
+#Выбор товаров
+vcombo = ttk.Combobox(values=vlist, textvariable=veidsstr)
+vcombo.set('Выберите карту')
+vcombo.pack(anchor=NW, padx = 0, pady = 0)
+
+mcombo = ttk.Combobox(values=mlist, textvariable=modelisstr)
+mcombo.set('Выберите карту')
+mcombo.pack(anchor=NW, padx = 0, pady = 10)
+
+#Чек в окне
+check = Label(root, text= "-Personālā datora sastāvdaļa-").place(x=200, y=3)
+veids_check = Label(root, text= "Veids: ").place(x=200, y=30)
+nosaukums_check = Label(root, text= "Modelis: " ).place(x=200, y=50)
+cena_check = Label(text= "Cena: ").place(x=200, y=70)
+
+#Ввод цены
+e = Entry(textvariable=cenastr).place(x=40, y=70)
+cena_choose = Label(root, text= "Cena: ").place(x=0, y=70)
+
+#кнопки
+update = Button(root, text='Update', command=button_update).place(x=20, y=110)
+save = Button(root, text='Save', command=save).place(x=20, y=140)
+exit = Button(root, text='Exit', command=root.destroy).place(x=20, y=170)
+
+
+
+root.mainloop()
