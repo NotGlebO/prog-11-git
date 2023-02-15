@@ -3,6 +3,7 @@ import random
 from  tkinter import *
 from tkinter.ttk import Combobox
 from  tkinter import ttk
+import tkinter
 
 #Aplikacija izmēri
 root = Tk()
@@ -34,29 +35,35 @@ try:
         vards TEXT,
         uzvards TEXT,
         login TEXT,
-
-    )
+        password TEXT,
+        prefix TEXT);
     '''
+    
     cursor = sqlite_connection.cursor()
     Label(root, text='Data base is connected', bg='green').grid(padx=50, pady=5)
     cursor.execute(sqlite_create_table_klients)
-    sqlite_connection.commit()
-    
     cursor.execute(sqlite_create_table_produtki)
+    cursor.execute(sqlite_create_table_account)
     sqlite_connection.commit()
-    
 except sq.Error as error:
     Label(root, error, text=" Error to conection sqlite base", bg='Red').grid(padx=50, pady=5)
 
 
+
+ 
+       
+
+
 #Administratora panelis 
 def administratora_panelis():
+
     admin_window = Tk()
     admin_window.title('Administratora panelis')
     admin_window.geometry('500x500')
 
     notebook = ttk.Notebook(admin_window)
     notebook.pack(pady=10, expand=True)
+    global frame2
     frame1 = ttk.Frame(notebook, width=500, height=480)
     frame2 = ttk.Frame(notebook, width=500, height=480)
     frame1.pack(fill='both', expand=True)
@@ -67,7 +74,6 @@ def administratora_panelis():
 
     pozicija = {"padx":6, "pady":6, "anchor":NW}
     checkbutton_klients_table = Checkbutton(frame2, text='Klientu tabula')
-    checkbutton_klients_table.select()
     checkbutton_klients_table.pack(**pozicija)
 
     checkbutton_admin_produkts = Checkbutton(frame2, text='Produktu tabula izmainišana tabula')
@@ -76,10 +82,22 @@ def administratora_panelis():
     checkbutton_admin_users = Checkbutton(frame2, text='Administratora mainīšana')
     checkbutton_admin_users.pack(**pozicija)
 
+    global combobox_user_value
+    combobox_user_value = StringVar()
+    combobox_users = Combobox(frame2, textvariable=combobox_user_value)
+    combobox_users['values'] = ['test']
+    combobox_users['state'] = ['readonly']
+    combobox_users.pack(side=LEFT)
+    combobox_users.bind('<<ComboboxSelect>>', users_list_reaction)
+    
 
-    listbox_users = Listbox(frame2)
-    listbox_users.pack(side=LEFT)
-    listbox_users.insert(0, 'Test')
+def users_list_reaction(event):
+    lists_users = []
+    users = cursor.execute(f'SELECT * FROM personals WHERE login = {combobox_user_value.get()}').fetchall() 
+    
+    for i in users:
+        lists_users.append(i)
+    print(lists_users)
 
 #Kleintu tabula izveidošna (search)
 def klientu_tabula():
