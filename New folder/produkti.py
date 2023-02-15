@@ -67,6 +67,7 @@ def administratora_panelis():
 
     pozicija = {"padx":6, "pady":6, "anchor":NW}
     checkbutton_klients_table = Checkbutton(frame2, text='Klientu tabula')
+    checkbutton_klients_table.select()
     checkbutton_klients_table.pack(**pozicija)
 
     checkbutton_admin_produkts = Checkbutton(frame2, text='Produktu tabula izmainišana tabula')
@@ -76,7 +77,9 @@ def administratora_panelis():
     checkbutton_admin_users.pack(**pozicija)
 
 
-    #Listbox
+    listbox_users = Listbox(frame2)
+    listbox_users.pack(side=LEFT)
+    listbox_users.insert(0, 'Test')
 
 #Kleintu tabula izveidošna (search)
 def klientu_tabula():
