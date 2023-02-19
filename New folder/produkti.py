@@ -11,6 +11,8 @@ root.title('Administratora aplikacija')
 root.geometry('220x250')
 
 
+
+
 #Datu bāzes iztradāšana un tabulu izveidošana 
 try:
     sqlite_connection = sq.connect('veikala_databaze.db')
@@ -51,7 +53,7 @@ except sq.Error as error:
 
 
  
-       
+    
 
 
 #Administratora panelis 
@@ -78,26 +80,46 @@ def administratora_panelis():
 
     checkbutton_admin_produkts = Checkbutton(frame2, text='Produktu tabula izmainišana tabula')
     checkbutton_admin_produkts.pack(**pozicija)
-
+    
     checkbutton_admin_users = Checkbutton(frame2, text='Administratora mainīšana')
     checkbutton_admin_users.pack(**pozicija)
 
-    global combobox_user_value
-    combobox_user_value = StringVar()
-    combobox_users = Combobox(frame2, textvariable=combobox_user_value)
-    combobox_users['values'] = ['test']
-    combobox_users['state'] = ['readonly']
-    combobox_users.pack(side=LEFT)
-    combobox_users.bind('<<ComboboxSelect>>', users_list_reaction)
+    
+    prefix_dictionary = {
+    '1' : checkbutton_klients_table, 
+    '2' : checkbutton_admin_produkts,
+    '3' : checkbutton_admin_users
+    }
+    
+    users_dict = {}
+    for i in cursor.execute('SELECT login, prefix FROM personals'):
+        list(i)
+        users_dict[i[0]] = [i[1]]
+
+  
+    
     
 
-def users_list_reaction(event):
-    lists_users = []
-    users = cursor.execute(f'SELECT * FROM personals WHERE login = {combobox_user_value.get()}').fetchall() 
     
-    for i in users:
-        lists_users.append(i)
-    print(lists_users)
+    combobox_user_value = StringVar()
+    combobox_users = Combobox(frame2, textvariable=combobox_user_value)
+    combobox_users['values'] = [*users_dict.keys()]
+    combobox_users['state'] = ['readonly']
+    combobox_users.pack(side=LEFT)
+    combobox_users.bind('<<ComboboxSelected>>', users_list_reaction(users_dict, prefix_dictionary, None))
+    
+
+def users_list_reaction(users_dict, prefix_dictionary, event):
+    login = event.widget.get()
+    prefix_str = users_dict.get(f'{login}')
+    for i in prefix_str[0]:
+        if i == ' ':
+            pass
+        else:
+            for x in i:
+                prefix_dictionary[x].select()
+
+
 
 #Kleintu tabula izveidošna (search)
 def klientu_tabula():
