@@ -74,52 +74,38 @@ def administratora_panelis():
     notebook.add(frame2, text='1')
 
 
-    pozicija = {"padx":6, "pady":6, "anchor":NW}
-    checkbutton_klients_table = Checkbutton(frame2, text='Klientu tabula')
-    checkbutton_klients_table.pack(**pozicija)
-
-    checkbutton_admin_produkts = Checkbutton(frame2, text='Produktu tabula izmainišana tabula')
-    checkbutton_admin_produkts.pack(**pozicija)
-    
-    checkbutton_admin_users = Checkbutton(frame2, text='Administratora mainīšana')
-    checkbutton_admin_users.pack(**pozicija)
 
     
-    prefix_dictionary = {
-    '1' : checkbutton_klients_table, 
-    '2' : checkbutton_admin_produkts,
-    '3' : checkbutton_admin_users
-    }
     
+    
+    global users_dict
     users_dict = {}
     for i in cursor.execute('SELECT login, prefix FROM personals'):
         list(i)
         users_dict[i[0]] = [i[1]]
-
+    print(users_dict)
   
     
-    
+   
 
-    
-    combobox_user_value = StringVar()
-    combobox_users = Combobox(frame2, textvariable=combobox_user_value)
+    global combobox_users
+    combobox_users = Combobox(frame2)
     combobox_users['values'] = [*users_dict.keys()]
     combobox_users['state'] = ['readonly']
-    combobox_users.pack(side=LEFT)
-    combobox_users.bind('<<ComboboxSelected>>', users_list_reaction(users_dict, prefix_dictionary, None))
+    combobox_users.pack(side=TOP)
+    combobox_users.bind('<<ComboboxSelected>>', users_list_reaction)
+    Label(frame2, text='Adminstratoru piejamiba: ').pack(padx=2, pady=0)
     
 
-def users_list_reaction(users_dict, prefix_dictionary, event):
+def users_list_reaction(event):
     login = event.widget.get()
-    prefix_str = users_dict.get(f'{login}')
-    for i in prefix_str[0]:
-        if i == ' ':
-            pass
-        else:
-            for x in i:
-                prefix_dictionary[x].select()
-
-
+    prefix = users_dict.get(f'{login}')
+    label_prefix_status = Label(frame2, text='ir', fg='green', font=(25))
+    if prefix == [1]:
+        label_prefix_status.pack()
+    else:
+        label_prefix_status.update(text='nav')
+        
 
 #Kleintu tabula izveidošna (search)
 def klientu_tabula():
