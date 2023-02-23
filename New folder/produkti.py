@@ -64,12 +64,12 @@ def administratora_panelis():
     admin_window.geometry('500x500')
 
     notebook = ttk.Notebook(admin_window)
-    notebook.pack(pady=10, expand=True)
+    notebook.grid(pady=10)
     global frame2
     frame1 = ttk.Frame(notebook, width=500, height=480)
     frame2 = ttk.Frame(notebook, width=500, height=480)
-    frame1.pack(fill='both', expand=True)
-    frame2.pack(fill='both', expand=True)
+    frame1.grid()
+    frame2.grid()
     notebook.add(frame1, text='1')
     notebook.add(frame2, text='1')
 
@@ -83,7 +83,7 @@ def administratora_panelis():
     for i in cursor.execute('SELECT login, prefix FROM personals'):
         list(i)
         users_dict[i[0]] = [i[1]]
-    print(users_dict)
+
   
     
    
@@ -92,20 +92,68 @@ def administratora_panelis():
     combobox_users = Combobox(frame2)
     combobox_users['values'] = [*users_dict.keys()]
     combobox_users['state'] = ['readonly']
-    combobox_users.pack(side=TOP)
+    combobox_users.grid(column=3, row=0)
     combobox_users.bind('<<ComboboxSelected>>', users_list_reaction)
-    Label(frame2, text='Adminstratoru piejamiba: ').pack(padx=2, pady=0)
+    Label(frame2, text='Adminstratoru piejamiba: ').grid(column=3, row=1)
+    Label(frame2, text=' ', font=(35)).grid(column=3,row=4)
+    Button(frame2, text='Dot prefiksu', command=add_prefix).grid(column=2, row=5)
+    Button(frame2, text='Atņemt prefiksu', command=remove_prefix).grid(column=3, row=5)
+
+
+    user_vards = Entry(frame2)
+    user_uzvards = Entry(frame2)
+    user_login = Entry(frame2)
+    user_parole = Entry(frame2, show='*')
+    user_prefix = Entry(frame2)
+
+    Label(frame2, text='Vārds').grid(column=12,row=19)
+    Label(frame2, text='Uzvārds').grid(column=12,row=21)
+    Label(frame2, text='Login').grid(column=12,row=23)
+    Label(frame2, text='Parole').grid(column=12,row=25)
+    Label(frame2, text='Prefix').grid(column=12,row=27)
+
+    user_vards.grid(column=12, row=20)
+    user_uzvards.grid(column=12, row=22)
+    user_login.grid(column=12, row=24)
+    user_parole.grid(column=12, row=26)
+    user_prefix.grid(column=12, row=28)
     
 
+def add_prefix():
+    login = combobox_users.get()
+    cursor.execute(f'UPDATE personals SET prefix=1 WHERE login="{login}"')
+    sqlite_connection.commit()
+    users_dict.clear()
+    for i in cursor.execute('SELECT login, prefix FROM personals'):
+        list(i)
+        users_dict[i[0]] = [i[1]]
+    
+
+def remove_prefix():
+    login = combobox_users.get()
+    cursor.execute(f'UPDATE personals SET prefix=0 WHERE login="{login}"')
+    sqlite_connection.commit()
+    users_dict.clear()
+    for i in cursor.execute('SELECT login, prefix FROM personals'):
+        list(i)
+        users_dict[i[0]] = [i[1]]
+
 def users_list_reaction(event):
+    label_prefix_status_yes = Label(frame2, text='Ir pieejams', fg='green', font=('Arial', 15))
+    label_prefix_status_no = Label(frame2, text='Nav pieejams', fg='red', font=('Arial', 13))
+    
     login = event.widget.get()
     prefix = users_dict.get(f'{login}')
-    label_prefix_status = Label(frame2, text='ir', fg='green', font=(25))
+    
     if prefix == [1]:
-        label_prefix_status.pack()
-    else:
-        label_prefix_status.update(text='nav')
         
+        label_prefix_status_yes.grid(column=3,row=4)
+        
+    else:
+        label_prefix_status_no.grid(column=3,row=4)
+        
+    
+    
 
 #Kleintu tabula izveidošna (search)
 def klientu_tabula():
