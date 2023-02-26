@@ -1,3 +1,5 @@
+
+
 import sqlite3 as sq
 import random 
 from  tkinter import *
@@ -68,13 +70,24 @@ def administratora_panelis():
     global frame2
     frame1 = ttk.Frame(notebook, width=500, height=480)
     frame2 = ttk.Frame(notebook, width=500, height=480)
+    frame3 = ttk.Frame(notebook, width=500, height=480)
     frame1.grid()
     frame2.grid()
-    notebook.add(frame1, text='1')
-    notebook.add(frame2, text='1')
+    frame3.grid()
+    notebook.add(frame1, text='Instrumenti')
+    notebook.add(frame2, text='Administratori')
+    notebook.add(frame3, text='Administratoru Tabula')
 
+    
+    #Frame 2
+    global frame_check_prefix
+    frame_add_user = LabelFrame(frame2, text='Add user')
+    frame_add_user.grid(column=0, row=0, padx=10)
 
-
+    frame_check_prefix = LabelFrame(frame2, text='Parbaudīt prefix')
+    frame_check_prefix.grid(column=1, row=0, )
+    
+    
     
     
     
@@ -89,35 +102,96 @@ def administratora_panelis():
    
 
     global combobox_users
-    combobox_users = Combobox(frame2)
+    combobox_users = Combobox(frame_check_prefix)
     combobox_users['values'] = [*users_dict.keys()]
     combobox_users['state'] = ['readonly']
     combobox_users.grid(column=3, row=0)
     combobox_users.bind('<<ComboboxSelected>>', users_list_reaction)
-    Label(frame2, text='Adminstratoru piejamiba: ').grid(column=3, row=1)
-    Label(frame2, text=' ', font=(35)).grid(column=3,row=4)
-    Button(frame2, text='Dot prefiksu', command=add_prefix).grid(column=2, row=5)
-    Button(frame2, text='Atņemt prefiksu', command=remove_prefix).grid(column=3, row=5)
+    Label(frame_check_prefix, text='Adminstratoru piejamiba: ').grid(column=3, row=1)
+    Label(frame_check_prefix, text=' ', font=(35)).grid(column=3,row=4)
+    Button(frame_check_prefix, text='Dot prefiksu', command=add_prefix).grid(column=2, row=5)
+    Button(frame_check_prefix, text='Atņemt prefiksu', command=remove_prefix).grid(column=3, row=5)
 
 
-    user_vards = Entry(frame2)
-    user_uzvards = Entry(frame2)
-    user_login = Entry(frame2)
-    user_parole = Entry(frame2, show='*')
-    user_prefix = Entry(frame2)
+    global user_vards, user_uzvards, user_login, user_parole, user_prefix
+    user_vards = Entry(frame_add_user)
+    user_uzvards = Entry(frame_add_user)
+    user_login = Entry(frame_add_user)
+    user_parole = Entry(frame_add_user, show='*')
+    user_prefix = Combobox(frame_add_user)
+    user_prefix['values'] = ['Jā', 'Nē']
+    user_prefix['state'] = ['readonly']
+    save_button = Button(frame_add_user, text='Sglābat', command=save_new_user)
+   
 
-    Label(frame2, text='Vārds').grid(column=12,row=19)
-    Label(frame2, text='Uzvārds').grid(column=12,row=21)
-    Label(frame2, text='Login').grid(column=12,row=23)
-    Label(frame2, text='Parole').grid(column=12,row=25)
-    Label(frame2, text='Prefix').grid(column=12,row=27)
+   
+    
+
+    Label(frame_add_user, text='Vārds').grid(column=12,row=19)
+    Label(frame_add_user, text='Uzvārds').grid(column=12,row=21)
+    Label(frame_add_user, text='Login').grid(column=12,row=23)
+    Label(frame_add_user, text='Parole').grid(column=12,row=25)
+    Label(frame_add_user, text='Prefix').grid(column=12,row=27)
 
     user_vards.grid(column=12, row=20)
     user_uzvards.grid(column=12, row=22)
     user_login.grid(column=12, row=24)
     user_parole.grid(column=12, row=26)
     user_prefix.grid(column=12, row=28)
+    save_button.grid(column=12, row=32)
     
+    columns = ("Vārds", 
+    "Uzvārds", 
+    "login", 
+    'prefix'
+    )
+    global users_tree
+    users_tree = ttk.Treeview(frame3, column=columns, show='headings', height=5)
+    users_tree.heading('Vārds', text='Vārds')
+    users_tree.heading('Uzvārds', text='Uzvārds')
+    users_tree.heading('login', text='Login')
+    users_tree.heading('prefix', text='Prefix')
+
+    
+    for i in cursor.execute('SELECT vards, uzvards, login, prefix FROM personals'):
+        users_tree.insert('', 'end', text="1", values=i)
+    
+    users_tree.grid()
+
+    Button(frame3, text='Meklēt', command=search_button).grid( padx=100)
+    Button(frame3, text='Delete', command=delete).grid(padx=50)
+
+    
+    
+    
+    
+    
+
+def search_button():
+    search_menu = Tk()
+    search_menu.geometry('200x100')
+    search_menu.title('Meklēt')
+    Entry(search_menu)    
+def delete():
+    focus_item = users_tree.focus()
+    selected_item = users_tree.selection()[0]
+    item_details = users_tree.item(focus_item)
+    
+    users_tree.delete(selected_item)
+    cursor.execute(f'DELETE FROM personals WHERE login = "{item_details.get("values")[2]}"') 
+    sqlite_connection.commit()
+
+def save_new_user():
+    if user_prefix.get() == 'Jā':
+        IntPrefix = 1
+    else:
+        IntPrefix = 0
+    sqlite_connection.execute(f'INSERT INTO personals VALUES ("{user_vards.get()}", "{user_uzvards.get()}", "{user_login.get()}", "{user_parole.get()}", {IntPrefix})')
+    sqlite_connection.commit()
+    users_dict.clear()
+    for i in cursor.execute('SELECT login, prefix FROM personals'):
+        list(i)
+        users_dict[i[0]] = [i[1]]
 
 def add_prefix():
     login = combobox_users.get()
@@ -139,8 +213,8 @@ def remove_prefix():
         users_dict[i[0]] = [i[1]]
 
 def users_list_reaction(event):
-    label_prefix_status_yes = Label(frame2, text='Ir pieejams', fg='green', font=('Arial', 15))
-    label_prefix_status_no = Label(frame2, text='Nav pieejams', fg='red', font=('Arial', 13))
+    label_prefix_status_yes = Label(frame_check_prefix, text='Ir pieejams', fg='green', font=('Arial', 15))
+    label_prefix_status_no = Label(frame_check_prefix, text='Nav pieejams', fg='red', font=('Arial', 13))
     
     login = event.widget.get()
     prefix = users_dict.get(f'{login}')
