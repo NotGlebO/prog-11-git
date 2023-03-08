@@ -1,16 +1,13 @@
 
 
 import sqlite3 as sq
-import random 
 from  tkinter import *
 from tkinter.ttk import Combobox
 from  tkinter import ttk
-import tkinter
+import hashlib
+from tkinter import messagebox
 
-#Aplikacija izmēri
-root = Tk()
-root.title('Administratora aplikacija')
-root.geometry('220x250')
+
 
 
 
@@ -44,197 +41,216 @@ try:
     '''
     
     cursor = sqlite_connection.cursor()
-    Label(root, text='Data base is connected', bg='green').grid(padx=50, pady=5)
     cursor.execute(sqlite_create_table_klients)
     cursor.execute(sqlite_create_table_produtki)
     cursor.execute(sqlite_create_table_account)
     sqlite_connection.commit()
-except sq.Error as error:
-    Label(root, error, text=" Error to conection sqlite base", bg='Red').grid(padx=50, pady=5)
+except:
+    pass
 
 
 
  
     
 
+def confirm_button():
+    global login
+    login = cursor.execute(f'SELECT login, password FROM personals WHERE login = "{entry_login.get()}"').fetchall()
+    
 
+    if len(login) == 0:
+        Label(log_menu, text='Nepareiza logina vai parole', fg='red').grid(column=1, row=3)
+
+    else:
+        if hashlib.md5(f'{entry_password.get()}'.encode('UTF-8')).hexdigest() == login[0][1]:
+            menu()
+        else:
+            Label(log_menu, text='Nepareiza logina vai parole', fg='red').grid(column=1, row=3)
+        
+        
 #Administratora panelis 
 def administratora_panelis():
 
-    global users_tree, frame2, frame3, search_user_entry, frame_check_prefix, users_dict, combobox_users, instrument_tree
+    prefix = cursor.execute(f'SELECT prefix FROM personals WHERE login = "{login[0][0]}"').fetchall()
+    
+    if prefix[0][0] != 1:
+        messagebox.showerror('Error', 'Nav Prefiksu')
 
-    admin_window = Tk()
-    admin_window.title('Administratora panelis')
-    admin_window.geometry('1200x700')
+    else:
+        global users_tree, frame2, frame3, search_user_entry, frame_check_prefix, users_dict, combobox_users, instrument_tree
 
-    notebook = ttk.Notebook(admin_window)
-    notebook.grid(pady=10)
-    
-    global frame1
-    frame1 = ttk.Frame(notebook, width=500, height=480)
-    frame2 = ttk.Frame(notebook, width=500, height=480)
-    frame3 = ttk.Frame(notebook, width=500, height=480)
-    frame1.grid()
-    frame2.grid()
-    frame3.grid()
-    notebook.add(frame1, text='Instrumenti')
-    notebook.add(frame2, text='Administratori')
-    notebook.add(frame3, text='Administratoru Tabula')
+        admin_window = Tk()
+        admin_window.title('Administratora panelis')
+        admin_window.geometry('1200x700')
 
-    
+        notebook = ttk.Notebook(admin_window)
+        notebook.grid(pady=10)
+        
+        global frame1
+        frame1 = ttk.Frame(notebook, width=500, height=480)
+        frame2 = ttk.Frame(notebook, width=500, height=480)
+        frame3 = ttk.Frame(notebook, width=500, height=480)
+        frame1.grid()
+        frame2.grid()
+        frame3.grid()
+        notebook.add(frame1, text='Instrumenti')
+        notebook.add(frame2, text='Administratori')
+        notebook.add(frame3, text='Administratoru Tabula')
 
-    #Frame 1
-    
-    
-    
-    instrumen_columns = ("Nosaukums", 
-    "Kategorija", 
-    "Teh. raksturojums", 
-    'Pieejams',
-    'Cena',
-    'Instrumenta id'
-    )
-    
-    global instrument_tree
-    instrument_tree = ttk.Treeview(frame1, column=instrumen_columns, show='headings', height=10)
-    instrument_tree.grid(column=0, row=0)
-    
+        
 
-
-    instrument_tree.heading('Nosaukums', text='Nosaukums')
-    instrument_tree.heading('Teh. raksturojums', text='Teh. raksturojums')
-    instrument_tree.heading('Kategorija', text='Kategorija')
-    instrument_tree.heading('Pieejams', text='Pieejams')
-    instrument_tree.heading('Cena', text='Cena')
-    instrument_tree.heading('Instrumenta id', text='Instrumenta id')
-    
-    for i in cursor.execute('SELECT * FROM produkts'):
-        instrument_tree.insert('', 'end', text="1", values=i)
-    
-    
-    global entry_nosaukums, entry_rakturojums, entry_kategorija, entry_pieejams, entry_cena, entry_instrumenta_id
-    label_nosaukums = Label(frame1, text='Nosaukums')
-    entry_nosaukums = Entry(frame1, width=15)
-    label_raksturojums = Label(frame1, text='Raksturojums')
-    entry_rakturojums = Text(frame1, width=50, height=10)
-    label_kategorija = Label(frame1, text='Kategorija')
-    entry_kategorija = Entry(frame1, width=15)
-    label_pieejams = Label(frame1, text='Kategorija')
-    entry_pieejams = Entry(frame1, width=15)
-    label_cena = Label(frame1, text='Cena')
-    entry_cena = Entry(frame1)
-    label_istrumenta_id = Label(frame1, text='Instrumenta_id')
-    entry_instrumenta_id = Entry(frame1)
-    instrument_add = Button(frame1, text='Add instrumentu', command=add_instrument)
-    instrument_remove = Button(frame1, text='Remove instrumentu', command=remove_instrument)
-
-    label_nosaukums.grid()
-    entry_nosaukums.grid()
-    label_raksturojums.grid()
-    entry_rakturojums.grid()
-    label_kategorija.grid()
-    entry_kategorija.grid()
-    label_pieejams.grid()
-    entry_pieejams.grid()
-    label_cena.grid()
-    entry_cena.grid()
-    label_istrumenta_id.grid()
-    entry_instrumenta_id.grid()
-    instrument_add.grid()
-    instrument_remove.grid()
-    #Frame 2
-    
-    frame_add_user = LabelFrame(frame2, text='Add user')
-    frame_add_user.grid(column=0, row=0, padx=10)
-
-    frame_check_prefix = LabelFrame(frame2, text='Parbaudīt prefix')
-    frame_check_prefix.grid(column=1, row=0, )
-    
-    
-    
-    
-    
-    
-    users_dict = {}
-    for i in cursor.execute('SELECT login, prefix FROM personals'):
-        list(i)
-        users_dict[i[0]] = [i[1]]
-
-  
-    
-   
-
-     
-    combobox_users = Combobox(frame_check_prefix)
-    combobox_users['values'] = [*users_dict.keys()]
-    combobox_users['state'] = ['readonly']
-    combobox_users.grid(column=3, row=0)
-    combobox_users.bind('<<ComboboxSelected>>', users_list_reaction)
-    Label(frame_check_prefix, text='Adminstratoru piejamiba: ').grid(column=3, row=1)
-    Label(frame_check_prefix, text=' ', font=(35)).grid(column=3,row=4)
-    Button(frame_check_prefix, text='Dot prefiksu', command=add_prefix).grid(column=2, row=5)
-    Button(frame_check_prefix, text='Atņemt prefiksu', command=remove_prefix).grid(column=3, row=5)
+        #Frame 1
+        
+        
+        
+        instrumen_columns = ("Nosaukums", 
+        "Kategorija", 
+        "Teh. raksturojums", 
+        'Pieejams',
+        'Cena',
+        'Instrumenta id'
+        )
+        
+        global instrument_tree
+        instrument_tree = ttk.Treeview(frame1, column=instrumen_columns, show='headings', height=10)
+        instrument_tree.grid(column=0, row=0)
+        
 
 
+        instrument_tree.heading('Nosaukums', text='Nosaukums')
+        instrument_tree.heading('Teh. raksturojums', text='Teh. raksturojums')
+        instrument_tree.heading('Kategorija', text='Kategorija')
+        instrument_tree.heading('Pieejams', text='Pieejams')
+        instrument_tree.heading('Cena', text='Cena')
+        instrument_tree.heading('Instrumenta id', text='Instrumenta id')
+        
+        for i in cursor.execute('SELECT * FROM produkts'):
+            instrument_tree.insert('', 'end', text="1", values=i)
+        
+        
+        global entry_nosaukums, entry_rakturojums, entry_kategorija, entry_pieejams, entry_cena, entry_instrumenta_id
+        label_nosaukums = Label(frame1, text='Nosaukums')
+        entry_nosaukums = Entry(frame1, width=15)
+        label_raksturojums = Label(frame1, text='Raksturojums')
+        entry_rakturojums = Text(frame1, width=50, height=10)
+        label_kategorija = Label(frame1, text='Kategorija')
+        entry_kategorija = Entry(frame1, width=15)
+        label_pieejams = Label(frame1, text='Kategorija')
+        entry_pieejams = Entry(frame1, width=15)
+        label_cena = Label(frame1, text='Cena')
+        entry_cena = Entry(frame1)
+        label_istrumenta_id = Label(frame1, text='Instrumenta_id')
+        entry_instrumenta_id = Entry(frame1)
+        instrument_add = Button(frame1, text='Add instrumentu', command=add_instrument)
+        instrument_remove = Button(frame1, text='Remove instrumentu', command=remove_instrument)
 
+        label_nosaukums.grid()
+        entry_nosaukums.grid()
+        label_raksturojums.grid()
+        entry_rakturojums.grid()
+        label_kategorija.grid()
+        entry_kategorija.grid()
+        label_pieejams.grid()
+        entry_pieejams.grid()
+        label_cena.grid()
+        entry_cena.grid()
+        label_istrumenta_id.grid()
+        entry_instrumenta_id.grid()
+        instrument_add.grid()
+        instrument_remove.grid()
+        #Frame 2
+        
+        frame_add_user = LabelFrame(frame2, text='Add user')
+        frame_add_user.grid(column=0, row=0, padx=10)
 
-    global user_vards, user_uzvards, user_login, user_parole, user_prefix
-    user_vards = Entry(frame_add_user)
-    user_uzvards = Entry(frame_add_user)
-    user_login = Entry(frame_add_user)
-    user_parole = Entry(frame_add_user, show='*')
-    user_prefix = Combobox(frame_add_user)
-    user_prefix['values'] = ['Jā', 'Nē']
-    user_prefix['state'] = ['readonly']
-    save_button = Button(frame_add_user, text='Sglābat', command=save_new_user)
-   
+        frame_check_prefix = LabelFrame(frame2, text='Parbaudīt prefix')
+        frame_check_prefix.grid(column=1, row=0, )
+        
+        
+        
+        
+        
+        
+        users_dict = {}
+        for i in cursor.execute('SELECT login, prefix FROM personals'):
+            list(i)
+            users_dict[i[0]] = [i[1]]
 
-   
+    
+        
     
 
-    Label(frame_add_user, text='Vārds').grid(column=12,row=19)
-    Label(frame_add_user, text='Uzvārds').grid(column=12,row=21)
-    Label(frame_add_user, text='Login').grid(column=12,row=23)
-    Label(frame_add_user, text='Parole').grid(column=12,row=25)
-    Label(frame_add_user, text='Prefix').grid(column=12,row=27)
+        
+        combobox_users = Combobox(frame_check_prefix)
+        combobox_users['values'] = [*users_dict.keys()]
+        combobox_users['state'] = ['readonly']
+        combobox_users.grid(column=3, row=0)
+        combobox_users.bind('<<ComboboxSelected>>', users_list_reaction)
+        Label(frame_check_prefix, text='Adminstratoru piejamiba: ').grid(column=3, row=1)
+        Label(frame_check_prefix, text=' ', font=(35)).grid(column=3,row=4)
+        Button(frame_check_prefix, text='Dot prefiksu', command=add_prefix).grid(column=2, row=5)
+        Button(frame_check_prefix, text='Atņemt prefiksu', command=remove_prefix).grid(column=3, row=5)
 
-    user_vards.grid(column=12, row=20)
-    user_uzvards.grid(column=12, row=22)
-    user_login.grid(column=12, row=24)
-    user_parole.grid(column=12, row=26)
-    user_prefix.grid(column=12, row=28)
-    save_button.grid(column=12, row=32)
-    
-    #Frame 3
 
-    columns = ("Vārds", 
-    "Uzvārds", 
-    "login", 
-    'prefix'
-    )
+
+
+        global user_vards, user_uzvards, user_login, user_parole, user_prefix
+        user_vards = Entry(frame_add_user)
+        user_uzvards = Entry(frame_add_user)
+        user_login = Entry(frame_add_user)
+        user_parole = Entry(frame_add_user, show='*')
+        user_prefix = Combobox(frame_add_user)
+        user_prefix['values'] = ['Jā', 'Nē']
+        user_prefix['state'] = ['readonly']
+        save_button = Button(frame_add_user, text='Sglābat', command=save_new_user)
     
-    users_tree = ttk.Treeview(frame3, column=columns, show='headings', height=5)
-    users_tree.heading('Vārds', text='Vārds')
-    users_tree.heading('Uzvārds', text='Uzvārds')
-    users_tree.heading('login', text='Login')
-    users_tree.heading('prefix', text='Prefix')
 
     
-    for i in cursor.execute('SELECT vards, uzvards, login, prefix FROM personals'):
-        users_tree.insert('', 'end', text="1", values=i)
-    
-    users_tree.grid(column=0, row=0)
+        
 
-    
-    frame_search_user = LabelFrame(frame3, text='Add user')
-    frame_search_user.grid(pady=14)
+        Label(frame_add_user, text='Vārds').grid(column=12,row=19)
+        Label(frame_add_user, text='Uzvārds').grid(column=12,row=21)
+        Label(frame_add_user, text='Login').grid(column=12,row=23)
+        Label(frame_add_user, text='Parole').grid(column=12,row=25)
+        Label(frame_add_user, text='Prefix').grid(column=12,row=27)
 
-    Label(frame_search_user, text='Uzvārds').grid(padx=2) 
-    search_user_entry = Entry(frame_search_user)
-    search_user_entry.grid()  
-    Button(frame_search_user, text='Meklēt', command=search_button_users).grid(pady=15) 
-    
-    Button(frame3, text='Delete', command=delete_user).grid(padx=50)
+        user_vards.grid(column=12, row=20)
+        user_uzvards.grid(column=12, row=22)
+        user_login.grid(column=12, row=24)
+        user_parole.grid(column=12, row=26)
+        user_prefix.grid(column=12, row=28)
+        save_button.grid(column=12, row=32)
+        
+        #Frame 3
+
+        columns = ("Vārds", 
+        "Uzvārds", 
+        "login", 
+        'prefix'
+        )
+        
+        users_tree = ttk.Treeview(frame3, column=columns, show='headings', height=5)
+        users_tree.heading('Vārds', text='Vārds')
+        users_tree.heading('Uzvārds', text='Uzvārds')
+        users_tree.heading('login', text='Login')
+        users_tree.heading('prefix', text='Prefix')
+
+        
+        for i in cursor.execute('SELECT vards, uzvards, login, prefix FROM personals'):
+            users_tree.insert('', 'end', text="1", values=i)
+        
+        users_tree.grid(column=0, row=0)
+
+        
+        frame_search_user = LabelFrame(frame3, text='Add user')
+        frame_search_user.grid(pady=14)
+
+        Label(frame_search_user, text='Uzvārds').grid(padx=2) 
+        search_user_entry = Entry(frame_search_user)
+        search_user_entry.grid()  
+        Button(frame_search_user, text='Meklēt', command=search_button_users).grid(pady=15) 
+        
+        Button(frame3, text='Delete', command=delete_user).grid(padx=50)
 
     
     
@@ -295,12 +311,20 @@ def save_new_user():
         IntPrefix = 1
     else:
         IntPrefix = 0
-    sqlite_connection.execute(f'INSERT INTO personals VALUES ("{user_vards.get()}", "{user_uzvards.get()}", "{user_login.get()}", "{user_parole.get()}", {IntPrefix})')
-    sqlite_connection.commit()
-    users_dict.clear()
-    for i in cursor.execute('SELECT login, prefix FROM personals'):
-        list(i)
-        users_dict[i[0]] = [i[1]]
+
+
+    login_prefix = cursor.execute(f'SELECT login FROM personals WHERE login = "{user_login.get()}"').fetchall()
+    print(login_prefix)
+    if len(login_prefix) == 1:
+        messagebox.showerror('Error', 'Ir lietotajs ar šaju loginu')
+    else:
+        user_parole_md5 = hashlib.md5(f'{user_parole.get()}'.encode('UTF-8')).hexdigest()
+        sqlite_connection.execute(f'INSERT INTO personals VALUES ("{user_vards.get()}", "{user_uzvards.get()}", "{user_login.get()}", "{user_parole_md5}", {IntPrefix})')
+        sqlite_connection.commit()
+        users_dict.clear()
+        for i in cursor.execute('SELECT login, prefix FROM personals'):
+            list(i)
+            users_dict[i[0]] = [i[1]]
 
 def add_prefix():
     login = combobox_users.get()
@@ -508,15 +532,35 @@ def klientu_registresana():
 
 
     
+def menu():
 
-#Pirmo logu ar pogiem
-Label(root, text='').grid(padx=50, pady=1)
-Label(root, text='Izvēlēties logu').grid(padx=50, pady=1)
-Button(root, text='Klientu reģistrēšana', bg='#94D16C', command=klientu_registresana,).grid(padx=50, pady=1)
-Button(root, text='Administratora panelis', bg='#F6B662', command=administratora_panelis).grid(padx=50, pady=2)
-Button(root, text='Exit',bg='#D86874', command=root.destroy).grid(padx=50, pady=3)
+    log_menu.destroy()
+    #Aplikacija izmēri
+    root = Tk()
+    root.title('Administratora aplikacija')
+    root.geometry('220x250')
+    #Pirmo logu ar pogiem
+    Label(root, text='').grid(padx=50, pady=1)
+    Label(root, text='Izvēlēties logu').grid(padx=50, pady=1)
+    Button(root, text='Klientu reģistrēšana', bg='#94D16C', command=klientu_registresana,).grid(padx=50, pady=1)
+    Button(root, text='Administratora panelis', bg='#F6B662', command=administratora_panelis).grid(padx=50, pady=2)
+    Button(root, text='Exit',bg='#D86874', command=root.destroy).grid(padx=50, pady=3)
 
-root.mainloop()
+
+log_menu = Tk()
+log_menu.geometry('220x250')
+log_menu.title('Login')
+entry_login = Entry(log_menu)
+entry_password = Entry(log_menu, show='*')
+connect_button = Button(log_menu, text='Confirm', command=confirm_button)
+
+Label(log_menu, text='Login').grid(column=0, row=0)
+entry_login.grid(column=1, row=0)
+Label(log_menu, text='Password').grid(column=0, row=1, pady=7)
+entry_password.grid(column=1, row=1)
+connect_button.grid(column=1, row=2)
+log_menu.mainloop()
+
 
 #https://coderslegacy.com/python/list-of-tkinter-widgets/
 #https://www.geeksforgeeks.org/python-gui-tkinter/
