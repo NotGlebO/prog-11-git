@@ -23,14 +23,15 @@ try:
         numurs TEXT,
         numura_kods TEXT,
         sakuma_datums TEXT,
-        beidzuma_datums TEXT);'''
+        beidzuma_datums TEXT,
+        instruments_id TEXT);'''
     sqlite_create_table_produtki = '''CREATE TABLE IF NOT EXISTS produkts(
         nosaukums TEXT,
         kategorija TEXT,
         tehniski_raksturojums TEXT,
         pieejams INTEGER,
         cena REAL,
-        instruments_id INTEGER);'''
+        instruments_id TEXT);'''
 
     sqlite_create_table_account = '''CREATE TABLE IF NOT EXISTS personals(
         vards TEXT,
@@ -85,7 +86,7 @@ def administratora_panelis():
 
     prefix = cursor.execute(f'SELECT prefix FROM personals WHERE login = "{login[0][0]}"').fetchall()
     
-    if prefix[0][0] != 1:
+    if prefix[0][0] != '1':
         messagebox.showerror('Kļūda', 'Nav Prefiksu')
 
     else:
@@ -331,7 +332,7 @@ def save_new_user():
 
 
     login_prefix = cursor.execute(f'SELECT login FROM personals WHERE login = "{user_login.get()}"').fetchall()
-    print(login_prefix)
+    
     if len(login_prefix) == 1:
         messagebox.showerror('Kļūda', 'Ir lietotājs ar šādu loginu')
     else:
@@ -374,7 +375,7 @@ def users_list_reaction(event):
     login = event.widget.get()
     prefix = users_dict.get(f'{login}')
     
-    if prefix == [1]:
+    if prefix == ["1"]:
         
         label_prefix_status_yes.grid(column=3,row=4)
         
@@ -436,19 +437,26 @@ def search_button_klients():
 
 
     if search_klients_entry.get() == '':
+        tree.delete(tree.get_children()[0])
         searched_uzvards = cursor.execute('SELECT * FROM klients')
+
     else:
         searched_uzvards = cursor.execute(f'SELECT * FROM klients WHERE uzvards LIKE "{search_klients_entry.get()}"').fetchall()
         for item in tree.get_children():
             tree.delete(item)
     for i in searched_uzvards:
-        tree.insert('', 'end', text="1", values=i)
+        tree.insert('', 'end', text="", values=i)
     
 #Klientu saglabāšana
 
 def saglabasana_datne():
  
     pedeja_id = cursor.execute('SELECT klientu_id FROM klients').fetchall()
+    
+    istrument = cursor.execute(f'SELECT pieejams FROM produkts WHERE instruments_id = {entry_instruments_id}').fetchall()
+
+  
+
     if pedeja_id == []:
         pedeja_id = 0
     else:
@@ -457,13 +465,13 @@ def saglabasana_datne():
                 pedeja_id = i
             except:
                 pass
-    try:
-        sqlite_connection.execute(f'INSERT INTO klients VALUES ({pedeja_id+1},"{entry_vards.get()}", "{entry_uzvards.get()}", "{entry_personas_kods.get()}", "{entry_telefona_numurs.get()}","{entry_telefona_kods.get()}", "{entry_sakuma_datums.get()}", "{entry_beiguma_datums.get()}", "{entry_instruments_id.get()}")')
-        sqlite_connection.commit()
-        Label(window_klient, text='Datne saglabājas', fg='green').grid(column=4, row=0)
-        Label(window_klient, text=f'Klientu {entry_vards.get()} {entry_uzvards.get()} kods: {pedeja_id+1}', fg='green').grid(column=4, row=1)
-    except:
-        Label(window_klient, text=f'Kļūda: {sq.Error}', fg='red').grid(column=4, row=0)
+    
+    sqlite_connection.execute(f'INSERT INTO klients VALUES ("{pedeja_id+1}","{entry_vards.get()}", "{entry_uzvards.get()}", "{entry_personas_kods.get()}", "{entry_telefona_numurs.get()}","{entry_telefona_kods.get()}", "{entry_sakuma_datums.get()}", "{entry_beiguma_datums.get()}", "{entry_instruments_id.get()}")')
+    sqlite_connection.commit()
+    Label(window_klient, text='Datne saglabājas', fg='green').grid(column=4, row=0)
+    Label(window_klient, text=f'Klientu {entry_vards.get()} {entry_uzvards.get()} kods: {pedeja_id+1}', fg='green').grid(column=4, row=1)
+    
+    # Label(window_klient, text=f'Kļūda: {sq.Error}', fg='red').grid(column=4, row=0)
 
 #Klientu noņemšana
 
