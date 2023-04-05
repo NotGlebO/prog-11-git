@@ -453,7 +453,7 @@ def saglabasana_datne():
  
     pedeja_id = cursor.execute('SELECT klientu_id FROM klients').fetchall()
     
-    istrument = cursor.execute(f'SELECT pieejams FROM produkts WHERE instruments_id = {entry_instruments_id}').fetchall()
+    
 
   
 
@@ -577,5 +577,4 @@ Label(log_menu, text='Parole').grid(column=0, row=1, pady=7)
 entry_password.grid(column=1, row=1)
 connect_button.grid(column=1, row=2)
 log_menu.mainloop()
-
 
