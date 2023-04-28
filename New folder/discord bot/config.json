@@ -1,0 +1,85 @@
+{
+    "select_id": 1092419887630127156,
+    "token": "MTA1MDg0MTk3NTMyNDE1NTk3NQ.GqmtYi.0AJJQ2Y_Nbo1a1aoQ0zYKlbISoDBAFMyOv-ilk",
+    "discord_server_id": 905533684692701317,
+    "premissions": {
+        "B class": 519602892240322561,
+        "A class": 788793371472822353,
+        "PHM": 968062704046718988
+    },
+    "roles_id": {
+        "chaotic": {
+            "server": 958723980808839198,
+            "y_moderator": 958726692678033418
+        },
+        "miigames": {
+            "server": 958372478726602802,
+            "y_moderator": 958368175785922640
+        },
+        "funrp": {
+            "server": 820653464656281610,
+            "y_moderator": 870945833678405673
+        },
+        "lightrp": {
+            "server": 820653461279866880,
+            "y_moderator": 870943109679308850
+        },
+        "mediumrp": {
+            "server": 839066494607687690,
+            "y_moderator": 870946674422456370
+        },
+        "hardrp": {
+            "server": 1040327788781129818,
+            "y_moderator": 1040328339493232770
+        },
+        "discrod": {
+            "coder": 790577342573445143,
+            "media": 946895011470012447,
+            "ivent": 979408698009083944,
+            "dekorator": 1052277929402454016
+        }
+    },
+    "servers": {
+        "crp": true,
+        "mg": true,
+        "fnrp": true,
+        "lrp": true,
+        "mrp": true,
+        "hrp": true,
+        "cdr": true,
+        "ivms": true,
+        "med": true,
+        "dkr": true,
+        "scrp": true,
+        "smg": true,
+        "sfnrp": true,
+        "slrp": true,
+        "smrp": true,
+        "shrp": true
+    },
+    "form_channel": {
+        "form_channel": 1043540545731039292,
+        "crp": 1043540545731039292,
+        "mg": 1043540545731039292,
+        "fnrp": 1043540545731039292,
+        "lrp": 1043540545731039292,
+        "mrp": 1043540545731039292,
+        "hrp": 1043540545731039292,
+        "cdr": 1043540545731039292,
+        "ivms": 1043540545731039292,
+        "med": 1043540545731039292,
+        "dkr": 1043540545731039292
+    },
+    "abbreviation": {
+        "crp": "Chaotic",
+        "mg": "MiniGames",
+        "fnrp": "FunRP",
+        "lrp": "LightRP",
+        "mrp": "MediumRP",
+        "hrp": "HardRP",
+        "cdr": "Coder",
+        "ivms": "Ivent master",
+        "med": "Media departament",
+        "dkr": "decorator"
+    }
+}
